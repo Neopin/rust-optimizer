@@ -137,3 +137,25 @@ COPY --from=builder /usr/local/bin/build_workspace /usr/local/bin
 ENTRYPOINT ["optimize_workspace.sh"]
 # Default argument when none is provided
 CMD ["."]
+
+#
+# workspace-optimizer
+#
+FROM base-optimizer as workspace-optimizer-private
+
+# GITHUB_TOKEN is used to clone private repositories
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+RUN apk add --no-cache git openssh
+RUN git config --global url."https://${GITHUB_TOKEN}@github.com/neopin".insteadOf "https://github.com/neopin"
+
+# Assume we mount the source code in /code
+WORKDIR /code
+
+# Add script as entry point
+COPY --from=builder /usr/local/bin/optimize_workspace.sh /usr/local/bin
+COPY --from=builder /usr/local/bin/build_workspace /usr/local/bin
+
+ENTRYPOINT ["optimize_workspace.sh"]
+# Default argument when none is provided
+CMD ["."]

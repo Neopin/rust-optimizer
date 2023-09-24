@@ -65,6 +65,15 @@ docker run --rm -v "$(pwd)":/code \
   cosmwasm/workspace-optimizer:0.14.0
 ```
 
+```shell
+docker buildx build --target workspace-optimizer-private --build-arg GITHUB_TOKEN={github_personal_access_token} -t cosmwasm/workspace-optimizer-private:0.14.0 .
+
+docker run --rm -v "$(pwd)":/code \
+  --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
+  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
+  cosmwasm/workspace-optimizer-private:0.14.0
+```
+
 The downside is that to verify one contract in the workspace, you need to compile them
 all, but the majority of the build time is in dependencies, which are shared and cached
 between the various contracts and thus the time is sub-linear with respect to number
